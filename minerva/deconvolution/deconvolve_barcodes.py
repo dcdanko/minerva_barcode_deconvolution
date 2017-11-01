@@ -1,8 +1,9 @@
 import sys
 import argparse as ap
-from .barcode_kmer_table import iterBarcodes
+from .barcode_kmer_table import parseBarcodes, parseBarcodesAndRemoveStopKmers
 from .build_and_filter_table import buildAndFilterTable
 from .cluster_matrix import clusterDistMatrix
+from .progress_bar import ProgressBar
 
 ################################################################################
 #
@@ -12,27 +13,40 @@ from .cluster_matrix import clusterDistMatrix
 
 def main():
     args = parseArgs()
-    
-    barcodeIter = iterBarcodes( sys.stdin, args.K, args.W, args.dropout, verbose=True)
-    barcodeTables = [bcTbl for bcTbl in barcodeIter]
 
+    if args.remove_stop_kmers:
+        barcodeTables = parseBarcodesAndRemoveStopKmers( sys.stdin,
+                                                         args.K,
+                                                         args.W,
+                                                         args.dropout,
+                                                         verbose=True)
+    else:
+        barcodeTables = parseBarcodes( sys.stdin, args.K, args.W, args.dropout,
+                                       verbose=True)
     msg = '{:,} barcodes were at or above dropout threshold'
     print(msg.format(len(barcodeTables)), file=sys.stderr)
 
-    anchors = (bcTbl for bcTbl in barcodeTables if bcTbl.numReads > args.anchor_dropout)
+    totalAnchors = 0
+    for bcTbl in barcodeTables:
+        if bcTbl.numReads() >= args.anchor_dropout:
+            totalAnchors += 1
+    progressBar = ProgressBar(totalAnchors)
+    sys.stderr.write('\n')    
+    progressBar.write()
+    
+    anchors = (bcTbl for bcTbl in barcodeTables if bcTbl.numReads() >= args.anchor_dropout)
     for  anchorTable in anchors:
-        sys.stderr.write('\n'+anchorTable.barcode)
-
         # build  and filter table
         anchorTable = buildAndFilterTable(anchorTable, barcodeTables, args)
         if anchorTable is None: # table was too small after filtering
+            progressBar.increment()
             continue
 
         # reduce and cluster the rows
         readAssignments = clusterDistMatrix( anchorTable, args)
 
         writeClusters( anchorTable, readAssignments, args)
-
+        progressBar.increment()
 
         
 def writeClusters(anchorTable, readAssignments, args):
@@ -64,7 +78,7 @@ def  parseArgs():
                         help='Filter kmers that rarely occur in other barcodes')
     parser.add_argument('--min-kmer-read', dest='min_kmer_per_read', default=1, type=float,
                         help='Require reads to have multiple kmers to overlap')
-    parser.add_argument( '--max-kmer', dest='rp_high_filter', default=0.5, type=float,
+    parser.add_argument( '--max-kmer', dest='rp_high_filter', default=0.03, type=float,
                          help='Filter kmers that occur constantly in other barcodes')    
     parser.add_argument('--min-barcode', dest='bc_low_filter', default=2, type=float,
                         help='Filter barcodes with low kmer overlap')
@@ -76,11 +90,16 @@ def  parseArgs():
     parser.add_argument('--min-cols', dest='min_cols', default=3, type=int,
                         help='Do not process tables with fewer cols (barcodes)')
 
-    parser.add_argument('--dbscan-eps',dest='dbscan_eps', default=0.3, type=float,
+    parser.add_argument('--eps',dest='dbscan_eps', default=0.26, type=float,
                         help='Distance threshold for DBSCAN clustering')
-    parser.add_argument('--dbscan-min-samples',dest='dbscan_min_samples',default=3, type=int,
+    parser.add_argument('--min-samples',dest='dbscan_min_samples',default=3, type=int,
                         help='Minimum samples in a cluster for dbscan')    
 
+    # experimental args
+    parser.add_argument('--remove-stopwords',dest='remove_stop_kmers', action='store_true', 
+                        help='Remove all kmers that occur 10x more often than average')    
+    
+    
     args = parser.parse_args()
     return args
 

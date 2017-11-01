@@ -61,7 +61,10 @@ class MinSparseKmerSet:
 
     def remove(self, kmer):
         del self.kmers[kmer]
-    
+
+    def removeKmers(self, stopKmers):
+        self.kmers = {k:v for k,v in self.kmers.items() if k not in stopKmers}
+        
     def __contains__(self, kmer):
         return kmer in self.kmers
 

@@ -1,5 +1,7 @@
 from .utils import passesFilter
 from collections import Counter
+import sys
+
 
 ################################################################################
 #
@@ -11,17 +13,19 @@ def buildAndFilterTable( anchorTable, barcodeTables, args):
     # build and filter table
     buildTable(anchorTable, barcodeTables, args)
     if anchorTable.numColumns() == 0:
-        sys.stderr.write('\tempty_table_before_filter')
+#        sys.stderr.write('\tempty_table_before_filter')
         return None
     filterTable( anchorTable, args)
 
     nrow, ncol = anchorTable.shape()
     tableTooSmall = nrow < args.min_rows or ncol < args.min_cols
     tableIsEmpty = nrow ==0 or ncol == 0
+    '''
     if not tableIsEmpty:
-        sys.stderr.write(' -> RF:' + str(anchorTable.shape()))
+#        sys.stderr.write(' -> RF:' + str(anchorTable.shape()))
     else:
-        sys.stderr.write('\t empty_table')
+#        sys.stderr.write('\t empty_table')
+    '''
     if tableTooSmall or tableIsEmpty:
         return None
 
@@ -30,8 +34,15 @@ def buildAndFilterTable( anchorTable, barcodeTables, args):
 
 def buildTable(anchorTable, otherTables, args):
     for otherTable in otherTables:
-        if not anchorTable.hasColumn( otherTable):
-            buildNewColumns(anchorTable, otherTable, args)
+        olap = len(otherTable.kmerSet() & anchorTable.kmerSet())
+        maxOlap = anchorTable.numReads()
+        if passesFilter( olap,
+                         maxOlap,
+                         args.bc_low_filter,
+                         args.bc_high_filter):
+            
+            if not anchorTable.hasColumn( otherTable):
+                buildNewColumns(anchorTable, otherTable, args)
             
 def buildNewColumns(anchorTable, otherTable, args):
     kmerCounts = {}
@@ -51,7 +62,7 @@ def buildNewColumns(anchorTable, otherTable, args):
             anchorReadPairs[rp] = 1
     anchorReadPairs = [rp for rp, count in anchorReadPairs.items() if count >= args.min_kmer_per_read]
     anchorTable.setColumn(otherTable.barcode, anchorReadPairs)
-    if otherTable.isAnchor:
+    if otherTable.numReads() >= args.anchor_dropout:
         otherReadPairs = {}
         for kmer in validKmers:
             rp = otherTable.kmerToReadPairs(kmer)[0] 
@@ -64,7 +75,7 @@ def buildNewColumns(anchorTable, otherTable, args):
         otherTable.setColumn(anchorTable.barcode, otherReadPairs)
         
 def filterTable(anchorTbl, args):
-    sys.stderr.write(' RU:({}, {})'.format(anchorTbl.numReads(), anchorTbl.numColumns()))    
+#    sys.stderr.write(' RU:({}, {})'.format(anchorTbl.numReads(), anchorTbl.numColumns()))    
     
     filtBarcodeTbl = {}
     for barcode, readPairs in anchorTbl.asDict().items():
@@ -75,7 +86,7 @@ def filterTable(anchorTbl, args):
                          args.bc_high_filter):
             filtBarcodeTbl[barcode] = readPairs
 
-    rpCounts = collections.Counter()
+    rpCounts = Counter()
     for barcode, readPairs in filtBarcodeTbl.items():
         rpCounts.update(readPairs)
 

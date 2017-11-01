@@ -75,7 +75,7 @@ class ReadCloud:
     
 ################################################################################
 
-def iterReadCloud( filelike):
+def iterReadClouds( filelike):
     rC = ReadCloud(None)
     for rP in iterFastq( filelike, interleaved=True):
         try:

@@ -1,10 +1,39 @@
-
-
+from minerva.gimmebio.kmers import MinSparseKmerSet
+from minerva.gimmebio.readclouds import iterReadClouds
+from itertools import combinations
+import numpy as np
+import sys
 
 ################################################################################
 
-def iterBarcodes(filelike, K, W, dropout, verbose=False):
-    for nBC, bc in enumerate( iterReadCloud(filelike)):
+def parseBarcodesAndRemoveStopKmers(filelike, K, W, dropout,
+                                    meanMultiplier=10,
+                                    verbose=False):
+    bcTbls = parseBarcodes(filelike, K, W, dropout, verbose=verbose)
+    kmerCounts = {}
+    totalCount = 0
+    for bcTbl in bcTbls:
+        for kmer in bcTbl.allKmers():
+            totalCount += 1
+            try:
+                kmerCounts[kmer] += 1
+            except KeyError:
+                kmerCounts[kmer] = 1
+    aveCount = totalCount / len(kmerCounts)
+    cutoff = aveCount * meanMultiplier
+    stopKmers = set()
+    for kmer, count in kmerCounts.items():
+        if (count == 1) or (count >  cutoff):
+            stopKmers.add(kmer)
+    print('Removing {:,} stop and singleton kmers'.format( len(stopKmers)), file=sys.stderr)
+    for bcTbl in bcTbls:
+        bcTbl.removeKmers( stopKmers)
+    print('Removed stop and singleton kmers', file=sys.stderr)
+    return bcTbls
+
+def parseBarcodes(filelike, K, W, dropout, verbose=False):
+    bcTbls = []
+    for nBC, bc in enumerate( iterReadClouds(filelike)):
         if verbose and ((nBC % 100) == 0):
             sys.stderr.write('\rparsed {:,} barcodes'.format(nBC))
         if len(bc) < dropout: 
@@ -13,18 +42,19 @@ def iterBarcodes(filelike, K, W, dropout, verbose=False):
         for rp in bc:
             seqs = [rp.r1.seq, rp.r2.seq]
             readKmerSets[rp.sid] = MinSparseKmerSet( K, W, seqs)
-        yield BarcodeTable(bc.barcode, readKmerSets)
+        bcTbls.append( BarcodeTable(bc.barcode, readKmerSets))
     if verbose:
-        sys.stderr.write('\r{:,} read clouds\n'.format(nBC))
-    
+        sys.stderr.write('\rparsed {:,} barcodes\n'.format(nBC))
+    return bcTbls
+
+        
 ################################################################################
 
 
 class BarcodeTable:
 
-    def __init__(self, barcode, readKmerSets, isAnchor):
+    def __init__(self, barcode, readKmerSets):
         self.barcode = barcode
-        self.numReads = len(readKmerSets)
         self.readKmerSets = readKmerSets
         self.reverseMap = None
         self.tbl = {}
@@ -42,6 +72,16 @@ class BarcodeTable:
                 except KeyError:
                     self.reverseMap[kmer] = [rp]
 
+    def removeKmers(self, stopKmers):
+        assert self.reverseMap is None
+        self._allKmers = {k for k in self._allKmers if k not in stopKmers}
+        for rp, kmerSet in self.readKmerSets.items():
+            kmerSet.removeKmers( stopKmers)
+        
+                   
+    ############################################################################
+
+
     def hasColumn(self, otherTbl):
         return (otherTbl.barcode in self.tbl) or (otherTbl.barcode == self.barcode)
 
@@ -53,8 +93,10 @@ class BarcodeTable:
     def setColumn(self, barcode, readPairs):
         self.tbl[barcode] = readPairs
 
+    def kmerSet(self):
+        return self._allKmers
+        
     def allKmers(self):
-        if self.
         # it is important that kmers that occur multiple times are returned multiple times
         for kmerSet in self.readKmerSets.values():
             for kmer in kmerSet:
@@ -90,7 +132,7 @@ class BarcodeTable:
             iam[i1,i2] = 1.0 / w
             iam[i2,i1] = 1.0 / w            
 
-        sys.stderr.write(' -> INV_ADJ:' + str(iam.shape))                    
+#        sys.stderr.write(' -> INV_ADJ:' + str(iam.shape))                    
         return iam, rowNames
 
     

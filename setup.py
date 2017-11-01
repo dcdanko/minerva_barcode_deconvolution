@@ -17,12 +17,15 @@ setuptools.setup(
     description="Toolsets for deconvolving and clustering barcoded short reads",
     long_description=open('README.rst').read(),
 
-    packages=setuptools.find_packages(),
+    packages=['minerva'],
+    package_dir={'minerva': 'minerva'},
+    
     ext_modules = [setuptools.Extension("cseqs", ["cext_minerva/_cseqs.c","cext_minerva/cseqs.c"])],
     
     entry_points = {
-        'console_script': [
-            'minerva_deconvolve=minerva.deconvolution.deconvolve_barcodes:main'
+        'console_scripts': [
+            'minerva_deconvolve=minerva.deconvolution.deconvolve_barcodes:main',
+            'minerva_enhance_kraken=minerva.kraken.enhance_kraken:main'
             ]
     },
     
