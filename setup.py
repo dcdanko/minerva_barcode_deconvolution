@@ -2,6 +2,9 @@ import setuptools
 
 requirements = [
     'Click>=6.0',
+    'scikit-learn==0.19.1',
+    'numpy==1.13.3',
+    'pandas==0.19.2'
     # TODO: put package requirements here
 ]
 
@@ -9,9 +12,9 @@ requirements = [
 setuptools.setup(
     name="minerva_barcoded_read_deconvolution",
     version="0.1.0",
-    url="https://github.com/borntyping/cookiecutter-pypackage-minimal",
+    url="https://github.com/dcdanko/minerva_barcode_deconvolution",
 
-    author="David C. Danko	",
+    author="David C. Danko",
     author_email="dcd3001@med.cornell.edu",
 
     description="Toolsets for deconvolving and clustering barcoded short reads",
@@ -33,9 +36,6 @@ setuptools.setup(
 
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
-        'Programming Language :: Python',
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',

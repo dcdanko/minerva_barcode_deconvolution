@@ -106,7 +106,32 @@ class BarcodeTable:
         return kmer in self._allKmers
 
 
-    def asInverseAdjacency(self):
+    def asAdjacencyList(self):
+        rpInds = {}
+        rowNames = {}
+        for bc, rps in self.tbl.items():
+            for rp in rps:
+                if rp not in rpInds:
+                    n = len(rpInds)
+                    rpInds[rp] = n
+                    rowNames[n] = rp
+                    
+        adjList = {}
+        for bc, rps in self.tbl.items():
+            for r1, r2 in combinations(rps, 2):
+                try:
+                    adjList[r1].add(r2)
+                except KeyError:
+                    adjList[r1] = set([r2])
+
+                try:
+                    adjList[r2].add(r1)
+                except KeyError:
+                    adjList[r2] = set([r1])
+        return adjList
+
+    
+    def asInverseAdjacency(self, crackThresh=-1):
         rpInds = {}
         rowNames = {}
         for bc, rps in self.tbl.items():
@@ -125,6 +150,9 @@ class BarcodeTable:
                 except KeyError:
                     ws[key] = 1
 
+        if crackThresh >= 1:
+            ws = self._crackEdges(ws, crackThresh)
+                    
         iam = (1000*1000) * np.ones( (len(rpInds), len(rpInds)))
         for (r1,r2), w in ws.items():
             i1 = rpInds[r1]
@@ -132,9 +160,20 @@ class BarcodeTable:
             iam[i1,i2] = 1.0 / w
             iam[i2,i1] = 1.0 / w            
 
-#        sys.stderr.write(' -> INV_ADJ:' + str(iam.shape))                    
+        sys.stderr.write(' -> INV_ADJ:' + str(iam.shape))                    
         return iam, rowNames
 
+
+    def _crackEdges(self, ws, crackThresh):
+        out = {}
+        adjList = self.asAdjacencyList()
+        for (r1,r2), w in ws.items():
+            if w == 1:
+                sharedNeibs = adjList[r1] & adjList[r2]
+                if len(sharedNeibs) < crackThresh:
+                    continue
+            out[(r1,r2)] = w
+        return out
     
     def asDataFrame(self):
         df = {}

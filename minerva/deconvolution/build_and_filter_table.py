@@ -13,19 +13,19 @@ def buildAndFilterTable( anchorTable, barcodeTables, args):
     # build and filter table
     buildTable(anchorTable, barcodeTables, args)
     if anchorTable.numColumns() == 0:
-#        sys.stderr.write('\tempty_table_before_filter')
+        sys.stderr.write('\tempty_table_before_filter')
         return None
     filterTable( anchorTable, args)
 
     nrow, ncol = anchorTable.shape()
     tableTooSmall = nrow < args.min_rows or ncol < args.min_cols
     tableIsEmpty = nrow ==0 or ncol == 0
-    '''
+
     if not tableIsEmpty:
-#        sys.stderr.write(' -> RF:' + str(anchorTable.shape()))
+        sys.stderr.write(' -> RF:' + str(anchorTable.shape()))
     else:
-#        sys.stderr.write('\t empty_table')
-    '''
+        sys.stderr.write('\t empty_table')
+
     if tableTooSmall or tableIsEmpty:
         return None
 
@@ -75,7 +75,7 @@ def buildNewColumns(anchorTable, otherTable, args):
         otherTable.setColumn(anchorTable.barcode, otherReadPairs)
         
 def filterTable(anchorTbl, args):
-#    sys.stderr.write(' RU:({}, {})'.format(anchorTbl.numReads(), anchorTbl.numColumns()))    
+    sys.stderr.write(' RU:({}, {})'.format(anchorTbl.numReads(), anchorTbl.numColumns()))    
     
     filtBarcodeTbl = {}
     for barcode, readPairs in anchorTbl.asDict().items():
@@ -87,9 +87,13 @@ def filterTable(anchorTbl, args):
             filtBarcodeTbl[barcode] = readPairs
 
     rpCounts = Counter()
+    nbc  = 0
     for barcode, readPairs in filtBarcodeTbl.items():
+        nbc += 1
         rpCounts.update(readPairs)
 
+    sys.stderr.write(' -> bcFilt:({}, {})'.format(len(rpCounts), nbc))    
+        
     goodReadPairs = set()
     for rpSID, numBarcodes in rpCounts.items():
         if passesFilter( numBarcodes,

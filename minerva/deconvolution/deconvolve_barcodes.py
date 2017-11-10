@@ -37,16 +37,19 @@ def main():
     anchors = (bcTbl for bcTbl in barcodeTables if bcTbl.numReads() >= args.anchor_dropout)
     for  anchorTable in anchors:
         # build  and filter table
+        sys.stderr.write( anchorTable.barcode)
         anchorTable = buildAndFilterTable(anchorTable, barcodeTables, args)
         if anchorTable is None: # table was too small after filtering
-            progressBar.increment()
+            #            progressBar.increment()
+            sys.stderr.write('\n')
             continue
 
         # reduce and cluster the rows
         readAssignments = clusterDistMatrix( anchorTable, args)
 
         writeClusters( anchorTable, readAssignments, args)
-        progressBar.increment()
+        sys.stderr.write('\n')
+        #       progressBar.increment()
 
         
 def writeClusters(anchorTable, readAssignments, args):
@@ -71,7 +74,7 @@ def  parseArgs():
     
     parser.add_argument('-d', '--dropout', dest='dropout', default=100, type=int,
                         help='Ignore barcodes with fewer reads')
-    parser.add_argument('--anchor-dropout', dest='anchor_dropout', default=200, type=int,
+    parser.add_argument('-a', '--anchor-dropout', dest='anchor_dropout', default=200, type=int,
                         help='Do not process anchors with fewer reads')
 
     parser.add_argument('--min-kmer', dest='rp_low_filter', default=1, type=float,
@@ -92,13 +95,23 @@ def  parseArgs():
 
     parser.add_argument('--eps',dest='dbscan_eps', default=0.26, type=float,
                         help='Distance threshold for DBSCAN clustering')
-    parser.add_argument('--min-samples',dest='dbscan_min_samples',default=3, type=int,
+    parser.add_argument('--min-samples',dest='dbscan_min_samples',default=2, type=int,
                         help='Minimum samples in a cluster for dbscan')    
 
     # experimental args
     parser.add_argument('--remove-stopwords',dest='remove_stop_kmers', action='store_true', 
                         help='Remove all kmers that occur 10x more often than average')    
-    
+
+
+    parser.add_argument('--rescue-unassigned',dest='rescue_unassigned', action='store_true', 
+                        help='Try to assign reads not assigned by DBSCAN')    
+
+    parser.add_argument('--min-rescue', dest='min_rescue', default=2, type=int,
+                        help='Rescue a read if it has this many connections to at most one cluster')
+
+    parser.add_argument('--crack-edges', dest='crack_thresh', default=1, type=int,
+                        help='Require that nodes that share a single edge share neighbours')
+
     
     args = parser.parse_args()
     return args
