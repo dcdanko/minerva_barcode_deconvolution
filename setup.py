@@ -20,7 +20,7 @@ setuptools.setup(
     description="Toolsets for deconvolving and clustering barcoded short reads",
     long_description=open('README.rst').read(),
 
-    packages=['minerva'],
+    packages=setuptools.find_packages(),
     package_dir={'minerva': 'minerva'},
     
     ext_modules = [setuptools.Extension("cseqs", ["cext_minerva/_cseqs.c","cext_minerva/cseqs.c"])],

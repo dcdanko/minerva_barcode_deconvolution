@@ -2,7 +2,7 @@ import sys
 import argparse as ap
 import numpy as np
 import math
-from gimmebio.kmers import *
+from ..gimmebio.kmers import *
 
 
 ################################################################################
