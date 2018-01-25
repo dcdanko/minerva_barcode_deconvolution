@@ -30,6 +30,11 @@ def main():
     for bcTbl in barcodeTables:
         if bcTbl.numReads() >= args.anchor_dropout:
             totalAnchors += 1
+    msg = '{:,} barcodes are anchors'
+    print(msg.format(totalAnchors), file=sys.stderr)
+    if totalAnchors == 0:
+        print('No anchors found', file=sys.stderr)
+        return
     progressBar = ProgressBar(totalAnchors)
     sys.stderr.write('\n')    
     progressBar.write()
@@ -72,9 +77,9 @@ def  parseArgs():
     parser.add_argument('-w', '--window-len', dest='W', default=40, type=int,
                         help='Window for sparse kmers')
     
-    parser.add_argument('-d', '--dropout', dest='dropout', default=100, type=int,
+    parser.add_argument('-d', '--dropout', dest='dropout', default=10, type=int,
                         help='Ignore barcodes with fewer reads')
-    parser.add_argument('-a', '--anchor-dropout', dest='anchor_dropout', default=200, type=int,
+    parser.add_argument('-a', '--anchor-dropout', dest='anchor_dropout', default=50, type=int,
                         help='Do not process anchors with fewer reads')
 
     parser.add_argument('--min-kmer', dest='rp_low_filter', default=1, type=float,
