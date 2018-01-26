@@ -1,10 +1,6 @@
 minerva_barcoded_read_deconvolution
 ===================================
 
-.. image:: https://img.shields.io/pypi/v/minerva_barcoded_read_deconvolution.svg
-    :target: https://pypi.python.org/pypi/minerva_barcoded_read_deconvolution
-    :alt: Latest PyPI version
-
 
 This is a demonstration program for graph-based deconvolution of linked reads. A more efficient multi-threaded version of this software is currently being developed. This program was used to write 'Minerva: An Alignment and Reference Free Approach to Deconvole Linked-Reads for Metagenomics'
 
@@ -27,6 +23,10 @@ Installation
     cd minerva_barcode_deconvolution
     python setup.py develop
 
+Output
+------
+
+Minerva outputs a tsv file with three columns: read id, barcode, and cluster id. The deconvolved barcode for a read is a tuple of (barcode, cluster id).
 
 Licence
 -------
