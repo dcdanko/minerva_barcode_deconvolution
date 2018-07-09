@@ -28,8 +28,10 @@ setuptools.setup(
     entry_points = {
         'console_scripts': [
             'minerva_deconvolve=minerva.deconvolution.deconvolve_barcodes:main',
-            'minerva_enhance_kraken=minerva.kraken.enhance_kraken:main'
-            ]
+            'minerva_enhance_kraken=minerva.kraken.enhance_kraken:main',
+            'minerva_eval=minerva.eval.eval_deconvolution:main',
+            'minerva_annotate=minerva.eval.annotate_fastq:main',
+        ]
     },
     
     install_requires=requirements,

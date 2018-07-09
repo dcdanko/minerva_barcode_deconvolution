@@ -38,7 +38,10 @@ def main():
     progressBar = ProgressBar(totalAnchors)
     sys.stderr.write('\n')    
     progressBar.write()
-    
+
+    output_file = sys.stdout
+    if args.output_file != '-':
+        output_file = open(args.output_file, 'w')
     anchors = (bcTbl for bcTbl in barcodeTables if bcTbl.numReads() >= args.anchor_dropout)
     for  anchorTable in anchors:
         # build  and filter table
@@ -51,16 +54,16 @@ def main():
 
         # reduce and cluster the rows
         readAssignments = clusterDistMatrix( anchorTable, args)
-
-        writeClusters( anchorTable, readAssignments, args)
+        writeClusters( anchorTable, readAssignments, output_file, args)
         sys.stderr.write('\n')
         #       progressBar.increment()
-
+    if output_file != sys.stdout:
+        output_file.close()
         
-def writeClusters(anchorTable, readAssignments, args):
+def writeClusters(anchorTable, readAssignments, output_file, args):
     for readId, clustNum in readAssignments.items():
-        msg = '{}\t{}\t{}'.format(anchorTable.barcode, readId, clustNum)
-        print(msg)
+        msg = '{}\t{}\t{}\n'.format(anchorTable.barcode, readId, clustNum)
+        output_file.write(msg)
 
 
 ################################################################################
@@ -102,6 +105,10 @@ def  parseArgs():
                         help='Distance threshold for DBSCAN clustering')
     parser.add_argument('--min-samples',dest='dbscan_min_samples',default=2, type=int,
                         help='Minimum samples in a cluster for dbscan')    
+
+    parser.add_argument('--output',dest='output_file',default='-', type=str,
+                        help='File where results should be written to. Defaults to stdout.')    
+
 
     # experimental args
     parser.add_argument('--remove-stopwords',dest='remove_stop_kmers', action='store_true', 
