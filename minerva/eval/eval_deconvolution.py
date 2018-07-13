@@ -29,7 +29,7 @@ def eval_cluster(alns):
     return size, aln_purity(aln_counts, size), aln_entropy(aln_counts, size)
 
 
-def parse_annotated_fastq(fqf):
+def parse_annotated_fastq(fqf, count_all=False):
     for i, line in enumerate(fqf):
         if (i % 4) == 0:
             tkns = line.strip().split()
@@ -38,16 +38,18 @@ def parse_annotated_fastq(fqf):
             for tkn in tkns:
                 if ('AL' in tkn) and ('UNAL' not in tkn):
                     al_token = tkn.split(':')[1]
-                if ('BX' in tkn) and ('E:' in tkn):
+                if ('BX' in tkn) and (count_all or 'E:' in tkn):
                     bc_token = tkn
+                    if count_all:
+                        bc_token = bc_token.split('E:')[0]
             if al_token and bc_token:
                 yield bc_token, al_token
 
-                    
-def parse_clusters(fastq_filename):
+                
+def parse_clusters(fastq_filename, count_all=False):
     current_ebx = None
     current_alns = []
-    for ebx, aln in parse_annotated_fastq(fastq_filename):
+    for ebx, aln in parse_annotated_fastq(fastq_filename, count_all=count_all):
         if ebx == current_ebx:
             current_alns.append(aln)
         else:
@@ -60,10 +62,11 @@ def parse_clusters(fastq_filename):
 
 
 @click.command()
-def main():
+@click.option('--count-all/--count-enhanced', default=False)
+def main(count_all):
     total_size, total_purity, total_entropy, N = 0, 0, 0, 0
     print('size,purity,entropy')
-    for cluster in parse_clusters(stdin):
+    for cluster in parse_clusters(stdin, count_all=count_all):
         size, purity, entropy = eval_cluster(cluster)
         print(f'{size},{purity},{entropy}')
         total_size += size

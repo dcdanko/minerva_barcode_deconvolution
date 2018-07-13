@@ -1,9 +1,9 @@
 from sys import stdout
 import pandas as pd
 import click
+from sys import stderr
 
-
-NRANKS = 9
+NRANKS = 20
 
 
 def parse_minerva_file(minerva_file, read_to_taxa):
@@ -12,11 +12,13 @@ def parse_minerva_file(minerva_file, read_to_taxa):
         for line in mf:
             tkns = line.strip().split('\t')
             bx = tkns[0]
-            ebx = tkns[0] + tkns[2]
+            ebx = tkns[0] + '$' + tkns[2]
             try:
                 taxa = read_to_taxa[tkns[1]]
             except KeyError:
-                taxa = []
+                taxa = ['unclassified']
+            if len(taxa) > 8:
+                taxa = taxa[:8]
             try:
                 bx_tbl[bx].append(taxa)
             except KeyError:
@@ -34,13 +36,14 @@ def parse_kraken_file(kraken_file):
         for line in kf:
             tkns = line.strip().split('\t')
             read = tkns[0]
-            taxa = tkns[1].split('|')
+            taxa = tkns[1].split(';')
             read_to_taxa[read] = taxa
     return read_to_taxa
 
 
-def promote(taxas):
-    taxa_tree = build_taxa_tree(taxas)
+def promote(taxas, taxa_tree=None):
+    if taxa_tree is None:
+        taxa_tree = build_taxa_tree(taxas)
     promoted_taxas = []
     for taxa in taxas:
         root = taxa_tree
@@ -65,18 +68,57 @@ def build_taxa_tree(taxas):
                 root = root[rank]
             except KeyError:
                 root[rank] = {}
+                root = root[rank]
+    return taxa_tree
     
 
 def promote_and_count(bx_tbl):
-    before, after  = [0] * NRANKS, [0] * NRANKS
+    before, after  = {}, {}
     for taxas in bx_tbl.values():
         promoted = promote(taxas)
         for taxa in taxas:
-            before[len(taxa)] += 1
+            try:
+                before[';'.join(taxa)] += 1
+            except KeyError:
+                before[';'.join(taxa)] = 1
         for taxa in promoted:
-            after[len(taxa)] += 1
+            try:
+                after[';'.join(taxa)] += 1
+            except KeyError:
+                after[';'.join(taxa)] = 1
     return before, after
-    
+
+
+def promote_and_count2_enhanced(bx_tbl, ebx_tbl):
+    tbl = {}
+    for ebx, taxas in ebx_tbl.items():
+        promoted_once = promote(taxas)
+        bx_tree = build_taxa_tree(bx_tbl[ebx.split('$')[0]])
+        promoted_twice = promote(promoted_once, bx_tree)
+
+        for original_taxa, promoted_taxa in zip(taxas, promoted_twice):
+            otaxa, ptaxa = ';'.join(original_taxa), ';'.join(promoted_taxa)
+            key = otaxa + ' -> ' + ptaxa 
+            try:
+                tbl[key] += 1
+            except KeyError:
+                tbl[key] = 1
+    return tbl
+
+
+def promote_and_count2(bx_tbl):
+    tbl = {}
+    for taxas in bx_tbl.values():
+        promoted = promote(taxas)
+        for original_taxa, promoted_taxa in zip(taxas, promoted):
+            otaxa, ptaxa = ';'.join(original_taxa), ';'.join(promoted_taxa)
+            key = otaxa + ' -> ' + ptaxa 
+            try:
+                tbl[key] += 1
+            except KeyError:
+                tbl[key] = 1
+    return tbl
+
 
 
 
@@ -86,9 +128,15 @@ def promote_and_count(bx_tbl):
 def main(minerva_file, kraken_file):
     read_to_taxa = parse_kraken_file(kraken_file)
     bx_tbl, ebx_tbl = parse_minerva_file(minerva_file, read_to_taxa)
+    '''
     inp_counts, bx_counts = promote_and_count(bx_tbl)
     _, ebx_counts = promote_and_count(ebx_tbl)
-    counts = pd.concat([inp_counts, bx_counts, ebx_counts])
+    counts = pd.DataFrame.from_dict({'inputs': inp_counts, 'standard': bx_counts, 'enhanced': ebx_counts}, orient='columns')
+    '''
+    counts = pd.DataFrame.from_dict({
+        'standard': promote_and_count2(bx_tbl),
+        'enhanced': promote_and_count2_enhanced(bx_tbl, ebx_tbl),
+    }, orient='columns')
     stdout.write(counts.to_csv())
 
 
