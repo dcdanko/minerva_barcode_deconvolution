@@ -50,6 +50,11 @@ BX:Z:GTGCCTTAGTCCGTAT-1 D00547:847:HYHNTBCXX:1:1202:16780:78102 0
 BX:Z:GTGCCTTAGTCCGTAT-1 D00547:847:HYHNTBCXX:1:1210:7460:13722  2
 ```
 
+### Performance
+
+This is a demonstration program and is not intended to be performant. Runtimes over 10 hours are common even on small datasets.
+RAM usage is typically 50-100Gb.
+
 ## Datasets
 
 The datasets used in the paper may be downloaded from AWS.
