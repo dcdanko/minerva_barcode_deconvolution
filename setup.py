@@ -10,8 +10,8 @@ requirements = [
 
 
 setuptools.setup(
-    name="minerva_barcoded_read_deconvolution",
-    version="0.1.0",
+    name="minerva_deconvolve",
+    version="1.0.0",
     url="https://github.com/dcdanko/minerva_barcode_deconvolution",
 
     author="David C. Danko",
@@ -37,7 +37,7 @@ setuptools.setup(
     install_requires=requirements,
 
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
