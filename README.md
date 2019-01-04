@@ -1,5 +1,9 @@
 # Minerva Barcoded Read Deconvolution
 
+[![CircleCI](https://circleci.com/gh/dcdanko/minerva_barcode_deconvolution.svg?style=svg)](https://circleci.com/gh/dcdanko/minerva_barcode_deconvolution)
+
+[![CodeFactor](https://www.codefactor.io/repository/github/dcdanko/minerva_barcode_deconvolution/badge)](https://www.codefactor.io/repository/github/dcdanko/minerva_barcode_deconvolution)
+
 Emerging linked-read technologies (aka Read-Cloud or barcoded short-reads) have revived interest in short-read technology as a viable way to understand large-scale structure in genomes and metagenomes. Linked-read technologies, such as the 10x Chromium system, use a microfluidic system and a specialized set of barcodes to tag short DNA reads sourced from the same long fragment of DNA. Subsequently, the tagged reads are sequenced on standard short read platforms.
 
 This approach results in interesting compromises. Each long fragment of DNA is only sparsely covered by reads, no information about the ordering of reads from the same fragment is preserved, and barcodes match reads from roughly 2-20 long fragments of DNA. However, compared to long read technologies the cost per base to sequence is far lower, far less input DNA is required, and the per base error rate is that of Illumina short-reads.

@@ -1,11 +1,12 @@
 import setuptools
 
 requirements = [
-    'Click>=6.0',
-    'scikit-learn==0.19.1',
-    'numpy==1.13.3',
-    'pandas==0.19.2'
-    # TODO: put package requirements here
+    'scikit-learn',
+    'numpy',
+    'pandas',
+    'scipy',
+    'click',
+    'argparse',
 ]
 
 
