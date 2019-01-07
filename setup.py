@@ -12,16 +12,13 @@ requirements = [
 
 setuptools.setup(
     name="minerva_deconvolve",
-    version="1.0.0",
+    version="1.0.1",
     url="https://github.com/dcdanko/minerva_barcode_deconvolution",
     author="David C. Danko",
     author_email="dcd3001@med.cornell.edu",
     description="Algorithm for deconvolving and clustering barcoded short reads",
     packages=setuptools.find_packages(),
     package_dir={'minerva': 'minerva'},
-    ext_modules=[
-        setuptools.Extension("cseqs", ["cext_minerva/_cseqs.c", "cext_minerva/cseqs.c"])
-    ],
     entry_points={
         'console_scripts': [
             'minerva_deconvolve=minerva.deconvolution.deconvolve_barcodes:main',
