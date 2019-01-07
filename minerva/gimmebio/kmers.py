@@ -1,4 +1,4 @@
-import cseqs
+
 from .seqs import *
 import click
 
@@ -17,10 +17,7 @@ class MinSparseKmerSet:
     def makeKmers(self, seqs, canonical):
         self.kmers = {}
         for seq in seqs:
-            if canonical:
-                kmers = cseqs.makeCanonicalKmers(seq, len(seq), self.K)
-            else:
-                kmers = cseqs.makeKmers(seq, len(seq), self.K)
+            kmers = makeKmers(seq, self.K, canon=canonical)
             kmers = [(kmer, hash(kmer)) for kmer in kmers]
             kmersInWindow = self.W - self.K + 1
             numWindows =  len(kmers) - kmersInWindow + 1

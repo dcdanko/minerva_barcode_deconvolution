@@ -104,7 +104,7 @@ def findStopKmers(filelike, k, w, dropout, meanMultiplier=10, verbose=False):
         sys.stderr.write('\rparsed {:,} barcodes\n'.format(nBC))
 
     aveCount = totalCount / len(kmerCounts)
-    cutoff = aveCount * meanMultiplier:
+    cutoff = aveCount * meanMultiplier
     for kmer, count in kmerCoutns.items():
         if count > cutoff:
             yield kmer
