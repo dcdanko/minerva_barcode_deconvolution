@@ -4,7 +4,7 @@
 
 [![CodeFactor](https://www.codefactor.io/repository/github/dcdanko/minerva_barcode_deconvolution/badge)](https://www.codefactor.io/repository/github/dcdanko/minerva_barcode_deconvolution)
 
-[![](https://img.shields.io/pypi/v/nine.svg)](https://pypi.org/project/minerva_deconvolve/)
+[![](https://img.shields.io/pypi/v/minerva_deconvolve.svg)](https://pypi.org/project/minerva_deconvolve/)
 
 Emerging linked-read technologies (aka Read-Cloud or barcoded short-reads) have revived interest in short-read technology as a viable way to understand large-scale structure in genomes and metagenomes. Linked-read technologies, such as the 10x Chromium system, use a microfluidic system and a specialized set of barcodes to tag short DNA reads sourced from the same long fragment of DNA. Subsequently, the tagged reads are sequenced on standard short read platforms.
 
