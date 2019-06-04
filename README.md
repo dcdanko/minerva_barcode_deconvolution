@@ -56,6 +56,11 @@ BX:Z:GTGCCTTAGTCCGTAT-1 D00547:847:HYHNTBCXX:1:1202:16780:78102 0
 BX:Z:GTGCCTTAGTCCGTAT-1 D00547:847:HYHNTBCXX:1:1210:7460:13722  2
 ```
 
+To add enhanced barcodes to your fastq file run the following
+```
+minerva_deconvolve_fastq <bc_assignment_file> <fastq_file> - > output.fq
+```
+
 ### Performance
 
 This is a demonstration program and is not intended to be performant. Runtimes over 10 hours are common even on small datasets.

@@ -12,7 +12,7 @@ requirements = [
 
 setuptools.setup(
     name="minerva_deconvolve",
-    version="1.0.1",
+    version="1.1.1",
     url="https://github.com/dcdanko/minerva_barcode_deconvolution",
     author="David C. Danko",
     author_email="dcd3001@med.cornell.edu",
@@ -25,6 +25,7 @@ setuptools.setup(
             'minerva_enhance_kraken=minerva.kraken.enhance_kraken:main',
             'minerva_eval=minerva.eval.eval_deconvolution:main',
             'minerva_annotate=minerva.eval.annotate_fastq:main',
+            'minerva_deconvolve_fastq=minerva.deconvolution.deconvolve_fasta:main',
         ]
     },
     install_requires=requirements,
