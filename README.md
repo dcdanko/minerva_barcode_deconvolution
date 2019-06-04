@@ -32,7 +32,7 @@ python setup.py install
 
 Use the following command to run barcode deconvolution. `<fastq>` should be an interleaved fastq file where reads have a `BX` tag designating barcode (this is the default output of [longranger basic](https://support.10xgenomics.com/genome-exome/software/pipelines/latest/advanced/other-pipelines))
 ```
-cat <fastq> | minerva_deconvolve -k 20 -w 40 -d 8 -a 20 --remove-stopwords > ebc_assignments.tsv
+cat <fastq> | minerva_deconvolve -k 20 -w 40 -d 8 -a 20 --remove-stopwords --eps 0.51 > ebc_assignments.tsv
 ```
 
 For more options
