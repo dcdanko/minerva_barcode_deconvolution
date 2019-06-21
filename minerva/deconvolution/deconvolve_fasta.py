@@ -21,7 +21,7 @@ def main(bc_assignment, fastq, outfile):
             rid, bc = tkns[:2]
             new_bc = bc_tbl.get(rid, bc)
             new_id_line = f'@{rid} {new_bc} {" ".join(tkns[2:])}\n'
-            outfile.write(line)
+            outfile.write(new_id_line)
         else:
             outfile.write(line)
 
