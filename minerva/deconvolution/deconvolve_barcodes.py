@@ -78,7 +78,7 @@ def writeClusters(anchorTable, readAssignments, output_file, args):
 def parseArgs():
     parser = ap.ArgumentParser()
 
-    parser.add_argument('-k', '--kmer-lens', dest='K',  default=20, type=int,
+    parser.add_argument('-k', '--kmer-lens', dest='K', default=20, type=int,
                         help='Lengths of kmers')
     parser.add_argument('-w', '--window-len', dest='W', default=40, type=int,
                         help='Window for sparse kmers')
@@ -93,7 +93,7 @@ def parseArgs():
     parser.add_argument('--min-kmer-read', dest='min_kmer_per_read', default=1, type=float,
                         help='Require reads to have multiple kmers to overlap')
     parser.add_argument('--max-kmer', dest='rp_high_filter', default=0.03, type=float,
-                        help='Filter kmers that occur constantly in other barcodes'
+                        help='Filter kmers that occur constantly in other barcodes')
     parser.add_argument('--min-barcode', dest='bc_low_filter', default=2, type=float,
                         help='Filter barcodes with low kmer overlap')
     parser.add_argument('--max-barcode', dest='bc_high_filter', default=0.9, type=float,
@@ -104,21 +104,19 @@ def parseArgs():
     parser.add_argument('--min-cols', dest='min_cols', default=3, type=int,
                         help='Do not process tables with fewer cols (barcodes)')
 
-    parser.add_argument('--eps',dest='dbscan_eps', default=0.26, type=float,
+    parser.add_argument('--eps', dest='dbscan_eps', default=0.26, type=float,
                         help='Distance threshold for DBSCAN clustering')
-    parser.add_argument('--min-samples',dest='dbscan_min_samples',default=2, type=int,
+    parser.add_argument('--min-samples', dest='dbscan_min_samples', default=2, type=int,
                         help='Minimum samples in a cluster for dbscan')
 
-    parser.add_argument('--output',dest='output_file',default='-', type=str,
+    parser.add_argument('--output', dest='output_file', default='-', type=str,
                         help='File where results should be written to. Defaults to stdout.')
 
-
     # experimental args
-    parser.add_argument('--remove-stopwords',dest='remove_stop_kmers', action='store_true',
+    parser.add_argument('--remove-stopwords', dest='remove_stop_kmers', action='store_true',
                         help='Remove all kmers that occur 10x more often than average')
 
-
-    parser.add_argument('--rescue-unassigned',dest='rescue_unassigned', action='store_true',
+    parser.add_argument('--rescue-unassigned', dest='rescue_unassigned', action='store_true',
                         help='Try to assign reads not assigned by DBSCAN')
 
     parser.add_argument('--min-rescue', dest='min_rescue', default=2, type=int,
@@ -126,7 +124,6 @@ def parseArgs():
 
     parser.add_argument('--crack-edges', dest='crack_thresh', default=1, type=int,
                         help='Require that nodes that share a single edge share neighbours')
-
 
     args = parser.parse_args()
     return args
