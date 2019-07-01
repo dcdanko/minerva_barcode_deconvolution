@@ -12,7 +12,7 @@ requirements = [
 
 setuptools.setup(
     name="minerva_deconvolve",
-    version="1.1.1",
+    version="1.1.2",
     url="https://github.com/dcdanko/minerva_barcode_deconvolution",
     author="David C. Danko",
     author_email="dcd3001@med.cornell.edu",
