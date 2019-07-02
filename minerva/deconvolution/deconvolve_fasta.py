@@ -18,7 +18,11 @@ def main(bc_assignment, fastq, outfile):
     for i, line in enumerate(fastq):
         if i % 4 == 0:
             tkns = line[1:].strip().split()
-            rid, bc = tkns[:2]
+            try:
+                rid, bc = tkns[:2]
+            except ValueError:  # Typically means this read was not barcoded
+                outfile.write(line)
+                continue
             new_bc = bc_tbl.get(rid, bc)
             new_id_line = f'@{rid} {new_bc} {" ".join(tkns[2:])}\n'
             outfile.write(new_id_line)
