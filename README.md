@@ -6,6 +6,12 @@
 
 [![](https://img.shields.io/pypi/v/minerva_deconvolve.svg)](https://pypi.org/project/minerva_deconvolve/)
 
+## Deprecation Notice
+
+Minerva was an initial proof of concept algorithm. It has since been superseded by [Ariadne](https://github.com/lauren-mak/Ariadne). You should use Ariadne over Minerva to deconvolve linked reads.
+
+## Summary
+
 Emerging linked-read technologies (aka Read-Cloud or barcoded short-reads) have revived interest in short-read technology as a viable way to understand large-scale structure in genomes and metagenomes. Linked-read technologies, such as the 10x Chromium system, use a microfluidic system and a specialized set of barcodes to tag short DNA reads sourced from the same long fragment of DNA. Subsequently, the tagged reads are sequenced on standard short read platforms.
 
 This approach results in interesting compromises. Each long fragment of DNA is only sparsely covered by reads, no information about the ordering of reads from the same fragment is preserved, and barcodes match reads from roughly 2-20 long fragments of DNA. However, compared to long read technologies the cost per base to sequence is far lower, far less input DNA is required, and the per base error rate is that of Illumina short-reads.
